@@ -15,7 +15,7 @@ const gameOptions = {
   maxSpeed: 1500,
   minSpeed: 800,
   max: 95,
-  time: 1, // 游戏时长
+  time: 20, // 游戏时长
   awardText: "恭喜获得女票一位"
 }
 
@@ -37,6 +37,7 @@ class TheGame {
   constructor() {
     this.launchGroup = null
     this.redPacketGroup = null
+    this.canClickCoin = true
   }
 
   // 资源预加载，会在phaser预加载期间执行，可以实时监控资源加载的进度
@@ -267,15 +268,16 @@ class TheGame {
     let openRect = new Phaser.Rectangle(rfuc(130), rfuc(315), 239, 239).copyFrom(this.showAwardCoin);
     // 点击开奖
     if (openRect.contains(game.input.x, game.input.y)) {
-      game.paused = false
-      this.openCoin = game.add.tween(this.showAwardCoin).to({ angle: -20 }, 100, 'Linear', true, 0, 6, false);
+      if (!this.canClickCoin) return
+      this.canClickCoin = false
+      this.openCoin = game.add.tween(this.showAwardCoin).to({ angle: -20 }, 100, 'Linear', true, 0, 6, true);
       this.openCoin.onComplete.add(this.getAwardResult, this)
     }
   }
 
   // 开奖结果
   getAwardResult() {
-    game.paused = true
+    this.canClickCoin = true
     document.getElementById('audioOpen').play()
     let ticketStyle = { fill: '#ffe67d', fontSize: '46px', fontWeight: 'bolder' }
     let ticketText = game.add.text(0, rfuc(338), gameOptions.awardText, ticketStyle)
